@@ -1,0 +1,73 @@
+body {
+    background-color: #0f172a;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+.container {
+    width: 400px;
+    margin: 100px auto;
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+h1 {
+    text-align: center;
+}
+
+select, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+}
+
+button {
+    background-color: #38bdf8;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0ea5e9;
+}
+
+#result {
+    margin-top: 15px;
+    padding: 10px;
+    background: #020617;
+}
+
+.hash-box {
+    margin-bottom: 20px;
+}
+
+.hash-box label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.hash-box textarea {
+    width: 100%;
+    height: 90px;
+    padding: 10px;
+    resize: none;
+}
+
+.hash-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.hash-description {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #020617;
+    border-left: 4px solid #38bdf8;
+    font-size: 14px;
+    color: #e5e7eb;
+}

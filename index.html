@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hash Thematic Project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="hash-box">
+
+    <label for="hashInput">Hash Input</label>
+
+    <textarea 
+        id="hashInput"
+        placeholder="Enter hash here...">
+    </textarea>
+    <button onclick="main()"></button>
+
+    <div class="hash-info">
+        <span id="charCount">Characters: 0</span>
+        <span id="hashType">Possible Hashes: Unknown</span>
+    </div>
+
+    <div id="hashDescription" class="hash-description">
+        Enter a hash to see its description.
+    </div>
+
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
