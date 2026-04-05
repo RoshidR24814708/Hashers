@@ -1,5 +1,5 @@
-const { hash } = require("node:crypto")
-
+// const { hash } = require("node:crypto")
+// ml2pdf } = require("html2pdf.js")
 
 
 
@@ -36,15 +36,25 @@ function checkHashLength(text, hashArray, patternArray) {
 function checkHashCharacters(text, hashArray, patternArray) {
     const textArr = text.split('')
 
-    for (let index = 0; index < textArr.length; index++) {
-        const element = textArr[index];
+    // for (let index = 0; index < textArr.length; index++) {
+    //     const element = textArr[index];
 
-        if (["%", "/", ".", "$", "!", ","].includes(element)) {
-            patternArray.push("Contains '% / . $ ! ,' ")
-            hashArray.push("bcrypt", "argon2")
-            return "bcrypt or argon2"
+        // if (["%", "/", ".", "$", "!", ","].includes(element)) {
+        //     patternArray.push("Contains $")
+        //     hashArray.push("bcrypt", "argon2")
+        //     return "bcrypt or argon2"
+        // }
+
+        if (text.includes("$")) {
+            console.log("bcrypt or argon2")
+        } else {
+            console.log("test")
         }
-    }
+
+        if (text.includes("=")) {
+            console.log("only argon2")
+        }
+    // }
 
     patternArray.push("Contains alphanumeric characters only")
     return "other"
@@ -67,7 +77,7 @@ function checkHashPrefix(text, hashArray, patternArray) {
     }
 }
 
-async function main() {
+function main() {
     // const result = await prompts({
     //     type: 'text',
     //     name: 'value',
@@ -77,7 +87,7 @@ async function main() {
 
     // const prompts = require('prompts');
     var hashPatterns = []
-    var possibleHashes = []
+var possibleHashes = []
 
     const hashType = document.getElementById("hashType");
     const description = document.getElementById("hashDescription");
@@ -99,6 +109,27 @@ async function main() {
     description.textContent = hashPatterns;
 }
 
-main();
+function exportPDF() {
+    var element = document.getElementById('HashSummary');
+    html2pdf(element);
+
+}
+
+function exportCSV() {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    // Convert array to CSV row (joining with commas)
+    csvContent += [ "32 Characters long", "Contains alphanumeric characters only", "no unique prefixes found" ].join(",");
+    
+    // Add newline if you have multiple rows
+    // csvContent += "\n";
+    // csvContent += anotherArray.join(",");
+    
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);
+}
+
+
+
 
 
