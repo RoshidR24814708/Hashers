@@ -1,10 +1,15 @@
-const { hash } = require("node:crypto")
+// const { hash } = require("node:crypto")
+// ml2pdf } = require("html2pdf.js")
 
-
+var hashPatterns = []
+var possibleHashes = []
 
 
 function checkHashLength(text, hashArray, patternArray) {
     textLength = text.length
+
+    const charLength = document.getElementById("charCount")
+    charLength.textContent = `Characters: ${textLength}`
 
     //  If 32 characters, remove all but MD5, NTLM (MD4), argon2
 	// - If 64 characters, it may be SHA-256
@@ -34,15 +39,15 @@ function checkHashLength(text, hashArray, patternArray) {
 }
 
 function checkHashCharacters(text, hashArray, patternArray) {
-    const textArr = text.split('')
-
-    for (let index = 0; index < textArr.length; index++) {
-        const element = textArr[index];
-
-        if (["%", "/", ".", "$", "!", ","].includes(element)) {
-            patternArray.push("Contains '% / . $ ! ,' ")
-            hashArray.push("bcrypt", "argon2")
-            return "bcrypt or argon2"
+    if (text.includes("$")) {
+        if (text.includes("=")) {
+            patternArray.push("Contains both '=' and '$' ")
+            hashArray.push("argon2")
+            return 0
+        } else {
+            patternArray.push("Contains only '$' ")
+            console.log("bcrypt")
+            return 0
         }
     }
 
@@ -54,51 +59,70 @@ function checkHashPrefix(text, hashArray, patternArray) {
     console.log(text.substring(0, 7))
 
     if (text.substring(0, 7)  == "$argon2") {
-        var index = hashArray.indexOf("bcrypt");
-
-        if (index !== -1) {
-            hashArray.splice(index, 1);
-        }
-
         patternArray.push("contains prefix 'argon2' ")
-        // hashArray.push("argon2")
+        hashArray.push("argon2")
     } else {
         patternArray.push("no unique prefixes found")
     }
 }
 
-async function main() {
-    // const result = await prompts({
-    //     type: 'text',
-    //     name: 'value',
-    //     message: 'Enter Hash: '
-
-    // })
-
-    // const prompts = require('prompts');
-    var hashPatterns = []
-    var possibleHashes = []
+function main() {
+    hashPatterns = []
+    possibleHashes = []
 
     const hashType = document.getElementById("hashType");
     const description = document.getElementById("hashDescription");
 
     const input = document.getElementById("hashInput").value.trim();
 
-    console.log("Hash: " + input)
+
     checkHashLength(input, possibleHashes, hashPatterns)
     checkHashCharacters(input, possibleHashes, hashPatterns)
     checkHashPrefix(input, possibleHashes, hashPatterns)
-
-    console.log(possibleHashes)
-    console.log(hashPatterns)
     
     hashType.textContent = `Possible Hashes: `
     hashType.textContent = `Possible Hashes: ${possibleHashes}`;
 
     description.textContent = ``
     description.textContent = hashPatterns;
+
+    console.log(hashPatterns)
+    console.log(possibleHashes)
 }
 
-main();
+function exportPDF() {
+    var element = document.getElementById('HashSummary');
+    html2pdf(element);
+
+}
+
+function exportCSV() {
+    if (possibleHashes.length === 0 && hashPatterns.length === 0) {
+        alert("No data to export");
+        return;
+    }
+    
+    let csvRows = [];
+    csvRows.push("Possible Hashes,Description");
+    
+    const hashesString = possibleHashes.join(", ");
+    const patternsString = hashPatterns.join(", ");
+    
+    csvRows.push(`"${hashesString}","${patternsString}"`);
+    
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `hash_export_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+
 
 
