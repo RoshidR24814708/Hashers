@@ -1,8 +1,8 @@
 // const { hash } = require("node:crypto")
 // ml2pdf } = require("html2pdf.js")
 
-    var hashPatterns = []
-    var possibleHashes = []
+var hashPatterns = []
+var possibleHashes = []
 
 
 function checkHashLength(text, hashArray, patternArray) {
@@ -39,27 +39,17 @@ function checkHashLength(text, hashArray, patternArray) {
 }
 
 function checkHashCharacters(text, hashArray, patternArray) {
-    const textArr = text.split('')
-
-    // for (let index = 0; index < textArr.length; index++) {
-    //     const element = textArr[index];
-
-        // if (["%", "/", ".", "$", "!", ","].includes(element)) {
-        //     patternArray.push("Contains $")
-        //     hashArray.push("bcrypt", "argon2")
-        //     return "bcrypt or argon2"
-        // }
-
-        if (text.includes("$")) {
-            console.log("bcrypt or argon2")
-        } else {
-            console.log("test")
-        }
-
+    if (text.includes("$")) {
         if (text.includes("=")) {
-            console.log("only argon2")
+            patternArray.push("Contains both '=' and '$' ")
+            hashArray.push("argon2")
+            return 0
+        } else {
+            patternArray.push("Contains only '$' ")
+            console.log("bcrypt")
+            return 0
         }
-    // }
+    }
 
     patternArray.push("Contains alphanumeric characters only")
     return "other"
@@ -69,28 +59,14 @@ function checkHashPrefix(text, hashArray, patternArray) {
     console.log(text.substring(0, 7))
 
     if (text.substring(0, 7)  == "$argon2") {
-        var index = hashArray.indexOf("bcrypt");
-
-        if (index !== -1) {
-            hashArray.splice(index, 1);
-        }
-
         patternArray.push("contains prefix 'argon2' ")
-        // hashArray.push("argon2")
+        hashArray.push("argon2")
     } else {
         patternArray.push("no unique prefixes found")
     }
 }
 
 function main() {
-    // const result = await prompts({
-    //     type: 'text',
-    //     name: 'value',
-    //     message: 'Enter Hash: '
-
-    // })
-
-    // const prompts = require('prompts');
     hashPatterns = []
     possibleHashes = []
 
@@ -119,24 +95,6 @@ function exportPDF() {
     html2pdf(element);
 
 }
-
-// function exportCSV() {
-//     let csvContent = "data:text/csv;charset=utf-8,";
-    
-//     // Convert array to CSV row (joining with commas)
-
-//     const hashesStr = `"${possibleHashes.join(", ")}"`;
-//     const descriptionStr = `"${hashPatterns.join(", ")}"`;
-    
-//     csvContent.push([hashesStr, descriptionStr].join(","));
-    
-//     // Add newline if you have multiple rows
-//     // csvContent += "\n";
-//     // csvContent += anotherArray.join(",");
-    
-//     var encodedUri = encodeURI(csvContent);
-//     window.open(encodedUri);
-// }
 
 function exportCSV() {
     if (possibleHashes.length === 0 && hashPatterns.length === 0) {
