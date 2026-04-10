@@ -3,6 +3,7 @@
 
 var hashPatterns = []
 var possibleHashes = []
+var Hashinput;
 
 
 function checkHashLength(text, hashArray, patternArray) {
@@ -72,22 +73,23 @@ function main() {
 
     const hashType = document.getElementById("hashType");
     const description = document.getElementById("hashDescription");
+    const hashInputField = document.getElementById("hashInput")
 
-    const input = document.getElementById("hashInput").value.trim();
+    Hashinput = hashInputField.value.trim();
 
+    if (Hashinput.length == 0) {
+        alert("no Hash Inputted")
+    } else {
+        checkHashLength(Hashinput, possibleHashes, hashPatterns)
+        checkHashCharacters(Hashinput, possibleHashes, hashPatterns)
+        checkHashPrefix(Hashinput, possibleHashes, hashPatterns)
+        
+        hashType.textContent = `Possible Hashes: `
+        hashType.textContent = `Possible Hashes: ${possibleHashes}`;
 
-    checkHashLength(input, possibleHashes, hashPatterns)
-    checkHashCharacters(input, possibleHashes, hashPatterns)
-    checkHashPrefix(input, possibleHashes, hashPatterns)
-    
-    hashType.textContent = `Possible Hashes: `
-    hashType.textContent = `Possible Hashes: ${possibleHashes}`;
-
-    description.textContent = ``
-    description.textContent = hashPatterns;
-
-    console.log(hashPatterns)
-    console.log(possibleHashes)
+        description.textContent = ``
+        description.textContent = hashPatterns;
+    }
 }
 
 function exportPDF() {
@@ -123,6 +125,32 @@ function exportCSV() {
     URL.revokeObjectURL(url);
 }
 
+function exportJSON() {
+    if (possibleHashes.length === 0 && hashPatterns.length === 0) {
+        alert("No data to export");
+        return;
+    }
+    
+    const exportData = {
+        hash: Hashinput,
+        hashLength: Hashinput.length,
+        possibleHashes: possibleHashes,
+        hashPatterns: hashPatterns,
+        exportDate: Date.now()
+    };
+    
+    const jsonContent = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `hash_export_${Date.now()}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
 
 
 
