@@ -1,6 +1,8 @@
 // const { hash } = require("node:crypto")
 // ml2pdf } = require("html2pdf.js")
 
+const { exit } = require("node:process");
+
 var hashPatterns = []
 var possibleHashes = []
 var Hashinput;
@@ -40,6 +42,8 @@ function checkHashLength(text, hashArray, patternArray) {
 }
 
 function checkHashCharacters(text, hashArray, patternArray) {
+
+    // check bcrypt/argon characters first
     if (text.includes("$")) {
         if (text.includes("=")) {
             patternArray.push("Contains both '=' and '$' ")
@@ -52,7 +56,14 @@ function checkHashCharacters(text, hashArray, patternArray) {
         }
     }
 
-    patternArray.push("Contains alphanumeric characters only")
+    // regex to check if alphanumeric
+    if (/^[a-zA-Z0-9]+$/.test(text)) {
+        patternArray.push("Contains alphanumeric characters only")
+        return 0
+    } else {
+        patternArray.push("Contains multiple types of characters")
+    }
+
     return "other"
 }
 
@@ -67,6 +78,10 @@ function checkHashPrefix(text, hashArray, patternArray) {
     }
 }
 
+function checkHashPresence() {
+    return Hashinput.length == 0;
+}
+
 function main() {
     hashPatterns = []
     possibleHashes = []
@@ -77,8 +92,9 @@ function main() {
 
     Hashinput = hashInputField.value.trim();
 
-    if (Hashinput.length == 0) {
-        alert("no Hash Inputted")
+    if (checkHashPresence()) {
+        alert("No Hash Inputted")
+        return;
     } else {
         checkHashLength(Hashinput, possibleHashes, hashPatterns)
         checkHashCharacters(Hashinput, possibleHashes, hashPatterns)
@@ -93,14 +109,18 @@ function main() {
 }
 
 function exportPDF() {
+    if (checkHashPresence()) {
+        alert("No Hash Inputted")
+        return;
+    }
+    
     var element = document.getElementById('HashSummary');
     html2pdf(element);
-
 }
 
 function exportCSV() {
-    if (possibleHashes.length === 0 && hashPatterns.length === 0) {
-        alert("No data to export");
+    if (checkHashPresence()) {
+        alert("No Hash Inputted")
         return;
     }
     
@@ -126,8 +146,8 @@ function exportCSV() {
 }
 
 function exportJSON() {
-    if (possibleHashes.length === 0 && hashPatterns.length === 0) {
-        alert("No data to export");
+    if (checkHashPresence()) {
+        alert("No Hash Inputted")
         return;
     }
     
@@ -151,6 +171,3 @@ function exportJSON() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
-
-
-
