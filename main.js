@@ -1,8 +1,11 @@
 // const { hash } = require("node:crypto")
 // ml2pdf } = require("html2pdf.js")
 
+const { exit } = require("node:process");
+
 var hashPatterns = []
 var possibleHashes = []
+var Hashinput;
 
 
 function checkHashLength(text, hashArray, patternArray) {
@@ -39,6 +42,8 @@ function checkHashLength(text, hashArray, patternArray) {
 }
 
 function checkHashCharacters(text, hashArray, patternArray) {
+
+    // check bcrypt/argon characters first
     if (text.includes("$")) {
         if (text.includes("=")) {
             patternArray.push("Contains both '=' and '$' ")
@@ -51,7 +56,14 @@ function checkHashCharacters(text, hashArray, patternArray) {
         }
     }
 
-    patternArray.push("Contains alphanumeric characters only")
+    // regex to check if alphanumeric
+    if (/^[a-zA-Z0-9]+$/.test(text)) {
+        patternArray.push("Contains alphanumeric characters only")
+        return 0
+    } else {
+        patternArray.push("Contains multiple types of characters")
+    }
+
     return "other"
 }
 
@@ -66,39 +78,49 @@ function checkHashPrefix(text, hashArray, patternArray) {
     }
 }
 
+function checkHashPresence() {
+    return Hashinput.length == 0;
+}
+
 function main() {
     hashPatterns = []
     possibleHashes = []
 
     const hashType = document.getElementById("hashType");
     const description = document.getElementById("hashDescription");
+    const hashInputField = document.getElementById("hashInput")
 
-    const input = document.getElementById("hashInput").value.trim();
+    Hashinput = hashInputField.value.trim();
 
+    if (checkHashPresence()) {
+        alert("No Hash Inputted")
+        return;
+    } else {
+        checkHashLength(Hashinput, possibleHashes, hashPatterns)
+        checkHashCharacters(Hashinput, possibleHashes, hashPatterns)
+        checkHashPrefix(Hashinput, possibleHashes, hashPatterns)
+        
+        hashType.textContent = `Possible Hashes: `
+        hashType.textContent = `Possible Hashes: ${possibleHashes}`;
 
-    checkHashLength(input, possibleHashes, hashPatterns)
-    checkHashCharacters(input, possibleHashes, hashPatterns)
-    checkHashPrefix(input, possibleHashes, hashPatterns)
-    
-    hashType.textContent = `Possible Hashes: `
-    hashType.textContent = `Possible Hashes: ${possibleHashes}`;
-
-    description.textContent = ``
-    description.textContent = hashPatterns;
-
-    console.log(hashPatterns)
-    console.log(possibleHashes)
+        description.textContent = ``
+        description.textContent = hashPatterns;
+    }
 }
 
 function exportPDF() {
+    if (checkHashPresence()) {
+        alert("No Hash Inputted")
+        return;
+    }
+    
     var element = document.getElementById('HashSummary');
     html2pdf(element);
-
 }
 
 function exportCSV() {
-    if (possibleHashes.length === 0 && hashPatterns.length === 0) {
-        alert("No data to export");
+    if (checkHashPresence()) {
+        alert("No Hash Inputted")
         return;
     }
     
@@ -123,6 +145,29 @@ function exportCSV() {
     URL.revokeObjectURL(url);
 }
 
-
-
-
+function exportJSON() {
+    if (checkHashPresence()) {
+        alert("No Hash Inputted")
+        return;
+    }
+    
+    const exportData = {
+        hash: Hashinput,
+        hashLength: Hashinput.length,
+        possibleHashes: possibleHashes,
+        hashPatterns: hashPatterns,
+        exportDate: Date.now()
+    };
+    
+    const jsonContent = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `hash_export_${Date.now()}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
