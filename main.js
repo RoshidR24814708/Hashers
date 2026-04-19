@@ -1,12 +1,6 @@
-// const { hash } = require("node:crypto")
-// ml2pdf } = require("html2pdf.js")
-
-const { exit } = require("node:process");
-
 var hashPatterns = []
 var possibleHashes = []
 var Hashinput;
-
 
 function checkHashLength(text, hashArray, patternArray) {
     textLength = text.length
@@ -22,8 +16,15 @@ function checkHashLength(text, hashArray, patternArray) {
     if (textLength == 32) {
         patternArray.push("32 Characters long")
         hashArray.push(["MD5", "NTLM"])
-        // return "MD5 or NTLM"
-    } else if (textLength == 64){
+        return "MD5 or NTLM";
+    } else if (textLength == 40) {
+        patternArray.push("40 Characters long")
+        hashArray.push("SHA-1")
+    } else if (textLength == 56) {
+        patternArray.push("56 Characters long")
+        hashArray.push("SHA-3")
+        return "SHA-2"
+    }  else if (textLength == 64){
         patternArray.push("64 Characters long")
         hashArray.push("SHA-256")
         return "SHA-256"
@@ -45,7 +46,7 @@ function checkHashCharacters(text, hashArray, patternArray) {
 
     // check bcrypt/argon characters first
     if (text.includes("$")) {
-        if (text.includes("=")) {
+        if (text.includes("=") && text.includes("'")) {
             patternArray.push("Contains both '=' and '$' ")
             hashArray.push("argon2")
             return 0
@@ -96,6 +97,8 @@ function main() {
         alert("No Hash Inputted")
         return;
     } else {
+        Hashinput = Hashinput.prototype.toLocaleLowerCase
+
         checkHashLength(Hashinput, possibleHashes, hashPatterns)
         checkHashCharacters(Hashinput, possibleHashes, hashPatterns)
         checkHashPrefix(Hashinput, possibleHashes, hashPatterns)
