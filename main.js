@@ -89,7 +89,8 @@ function main() {
 
     const hashType = document.getElementById("hashType");
     const description = document.getElementById("hashDescription");
-    const hashInputField = document.getElementById("hashInput")
+    const hashInputField = document.getElementById("hashInput");
+    const inputtedhash = document.getElementById("inputtedhash");
 
     Hashinput = hashInputField.value.trim();
 
@@ -97,7 +98,8 @@ function main() {
         alert("No Hash Inputted")
         return;
     } else {
-        Hashinput = Hashinput.prototype.toLocaleLowerCase
+        Hashinput = Hashinput.toLocaleLowerCase();
+        inputtedhash.innerText = "Inputted Hash: " + Hashinput;
 
         checkHashLength(Hashinput, possibleHashes, hashPatterns)
         checkHashCharacters(Hashinput, possibleHashes, hashPatterns)
@@ -112,12 +114,12 @@ function main() {
 }
 
 function exportPDF() {
-    if (checkHashPresence()) {
-        alert("No Hash Inputted")
-        return;
-    }
+    // if (checkHashPresence()) {
+    //     alert("No Hash Inputted")
+    //     return;
+    // }
     
-    var element = document.getElementById('HashSummary');
+    const element = document.getElementById('hash-info');
     html2pdf(element);
 }
 
