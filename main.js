@@ -1,6 +1,6 @@
 var hashPatterns = []
 var possibleHashes = []
-var Hashinput;
+var Hashinput = " ";
 
 function checkHashLength(text, hashArray, patternArray) {
     textLength = text.length
@@ -43,7 +43,6 @@ function checkHashLength(text, hashArray, patternArray) {
 }
 
 function checkHashCharacters(text, hashArray, patternArray) {
-
     // check bcrypt/argon characters first
     if (text.includes("$")) {
         if (text.includes("=") && text.includes("'")) {
@@ -79,8 +78,13 @@ function checkHashPrefix(text, hashArray, patternArray) {
     }
 }
 
-function checkHashPresence() {
-    return Hashinput.length == 0;
+function checkHashPresence(textHash) {
+    console.log(textHash.length);
+    return textHash.length == 0;
+}
+
+function exportError() {
+    return alert("No Hash to Export")
 }
 
 function main() {
@@ -94,7 +98,7 @@ function main() {
 
     Hashinput = hashInputField.value.trim();
 
-    if (checkHashPresence()) {
+    if (checkHashPresence(Hashinput)) {
         alert("No Hash Inputted")
         return;
     } else {
@@ -114,18 +118,18 @@ function main() {
 }
 
 function exportPDF() {
-    // if (checkHashPresence()) {
-    //     alert("No Hash Inputted")
-    //     return;
-    // }
+    if (checkHashPresence(Hashinput)) {
+        exportError();
+        return;
+    }
     
     const element = document.getElementById('hash-info');
     html2pdf(element);
 }
 
 function exportCSV() {
-    if (checkHashPresence()) {
-        alert("No Hash Inputted")
+    if (checkHashPresence(Hashinput)) {
+        exportError;
         return;
     }
     
@@ -151,8 +155,8 @@ function exportCSV() {
 }
 
 function exportJSON() {
-    if (checkHashPresence()) {
-        alert("No Hash Inputted")
+    if (checkHashPresence(Hashinput)) {
+        exportError;
         return;
     }
     
