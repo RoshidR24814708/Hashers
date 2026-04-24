@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/RoshidR24814708/Hashers/issues"
   },
-  "homepage": "https://github.com/RoshidR24814708/Hashers#readme"
+  "homepage": "https://github.com/RoshidR24814708/Hashers#readme",
+  "dependencies": {
+    "html2pdf.js": "^0.14.0"
+  }
 }

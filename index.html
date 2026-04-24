@@ -19,14 +19,21 @@
     </textarea>
     <button onclick="main()">Check Hash</button>
 
-    <div class="hash-info">
+    <div class="hash-info" id="hash-info">
+        <span id="inputtedhash">Inputted Hash:</span>
+        <br>
+        <br>
         <span id="charCount">Characters: 0</span>
+        <br>
         <span id="hashType">Possible Hashes: Unknown</span>
+        <br>
+
+         <div id="hashDescription" class="hash-description">
+        Enter a hash to see its description.
+        </div>
     </div>
 
-    <div id="hashDescription" class="hash-description">
-        Enter a hash to see its description.
-    </div>
+   
 
     <button onclick="exportPDF()">Export to PDF</button>
     <button onclick="exportCSV()">Export to CSV</button>
