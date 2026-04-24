@@ -1,85 +1,31 @@
-var hashPatterns = []
-var possibleHashes = []
+class HashAlgorithm {
+    constructor(name, identifiers) {
+        this.name = name; // String
+        this.identifiers = identifiers // Array
+    } 
+}
+
+const SHA1 = new HashAlgorithm("SHA-1", ["Alphanumeric Characters Only", "40 Characters Long"]);
+const SHA256 = new HashAlgorithm("SHA-256", ["Alphanumeric Characters Only", "64 Characters Long"]);
+const SHA384 = new HashAlgorithm("SHA-384", ["Alphanumeric Characters Only", "96 Characters Long"]);
+const SHA512 = new HashAlgorithm("SHA-512", ["Alphanumeric Characters Only", "128 Characters Long"]);
+const SHA3 = new HashAlgorithm("SHA-3", ["Alphanumeric Characters Only", "56 Characters Long"]);
+const MD5 = new HashAlgorithm("MD5", ["Alphanumeric Characters Only", "32 Characters Long"]);
+const NTLM = new HashAlgorithm("NTLM", ["Alphanumeric Characters Only", "32 Characters Long"]);
+const Argon2 = new HashAlgorithm("Argon2", ["Contains $", "Contains =", "Contains ,", "Variable character length", "Begins with $argon2"]);
+const Bcrypt = new HashAlgorithm("bcrypt", ["Contains $", "60 Characters Long"]);
+
+let HashList = [SHA1, SHA256, SHA384, SHA512, SHA3, MD5, NTLM, Argon2, Bcrypt]
+
+// arr1.filter(x => arr2.includes(x));
+
+// var hashPatterns = []
 var Hashinput = " ";
 
-function checkHashLength(text, hashArray, patternArray) {
-    textLength = text.length
+const identifiers = [""]
 
-    const charLength = document.getElementById("charCount")
-    charLength.textContent = `Characters: ${textLength}`
-
-    //  If 32 characters, remove all but MD5, NTLM (MD4), argon2
-	// - If 64 characters, it may be SHA-256
-	// - If 96 characters, it may be SHA-384
-	// - If 128 characters, it may be SHA-512
-
-    if (textLength == 32) {
-        patternArray.push("32 Characters long")
-        hashArray.push(["MD5", "NTLM"])
-        return "MD5 or NTLM";
-    } else if (textLength == 40) {
-        patternArray.push("40 Characters long")
-        hashArray.push("SHA-1")
-    } else if (textLength == 56) {
-        patternArray.push("56 Characters long")
-        hashArray.push("SHA-3")
-        return "SHA-2"
-    }  else if (textLength == 64){
-        patternArray.push("64 Characters long")
-        hashArray.push("SHA-256")
-        return "SHA-256"
-    } else if (textLength == 96){
-        patternArray.push("96 Characters long")
-        hashArray.push("SHA-384")
-        return "SHA-384"
-    } else if (textLength == 128){
-        patternArray.push("128 Characters long")
-        hashArray.push("SHA-512")
-        return "SHA-512"
-    } else {
-        patternArray.push("Variable character length")
-        return "Other"
-    }
-}
-
-function checkHashCharacters(text, hashArray, patternArray) {
-    // check bcrypt/argon characters first
-    if (text.includes("$")) {
-        if (text.includes("=") && text.includes("'")) {
-            patternArray.push("Contains both '=' and '$' ")
-            hashArray.push("argon2")
-            return 0
-        } else {
-            patternArray.push("Contains only '$' ")
-            console.log("bcrypt")
-            return 0
-        }
-    }
-
-    // regex to check if alphanumeric
-    if (/^[a-zA-Z0-9]+$/.test(text)) {
-        patternArray.push("Contains alphanumeric characters only")
-        return 0
-    } else {
-        patternArray.push("Contains multiple types of characters")
-    }
-
-    return "other"
-}
-
-function checkHashPrefix(text, hashArray, patternArray) {
-    console.log(text.substring(0, 7))
-
-    if (text.substring(0, 7)  == "$argon2") {
-        patternArray.push("contains prefix 'argon2' ")
-        hashArray.push("argon2")
-    } else {
-        patternArray.push("no unique prefixes found")
-    }
-}
 
 function checkHashPresence(textHash) {
-    console.log(textHash.length);
     return textHash.length == 0;
 }
 
@@ -88,26 +34,75 @@ function exportError() {
 }
 
 function main() {
-    hashPatterns = []
-    possibleHashes = []
+    let hashPatterns = []
+    let possibleHashes = []
 
-    const hashType = document.getElementById("hashType");
-    const description = document.getElementById("hashDescription");
+
+    function checkHashLength(text) {
+        textLength = text.length
+
+        const charLength = document.getElementById("charCount")
+        charLength.textContent = `Characters: ${textLength}`
+
+        hashPatterns.push(textLength + " Characters Long")
+    }
+
+    function checkHashCharacters(text) {
+        // check bcrypt/argon characters first
+        if (text.includes("$")) {
+            hashPatterns.push("Contains $")
+        }
+
+        if (text.includes("=")) {
+            hashPatterns.push("Contains =")
+        }
+
+        if (text.includes(",")) {
+            hashPatterns.push("Contains ,")
+        }
+
+        // regex to check if alphanumeric
+        if (/^[a-zA-Z0-9]+$/.test(text)) {
+            hashPatterns.push("Alphanumeric Characters Only")
+        }
+    }
+
+    function checkHashPrefix(text) {
+        if (text.substring(0, 7)  == "$argon2") {
+            hashPatterns.push("Begins with $argon2")
+        }
+    }
+
+    function compareHashes(){
+        for (let index = 0; index < HashList.length; index++) {
+            var element = HashList[index];
+
+            var match = hashPatterns.filter(x => element.identifiers.includes(x));
+
+            if (match.length == hashPatterns.length) {
+                possibleHashes.push(element.name)
+            }
+        }
+    }
+    
     const hashInputField = document.getElementById("hashInput");
-    const inputtedhash = document.getElementById("inputtedhash");
-
     Hashinput = hashInputField.value.trim();
 
+    // const hashType = document.getElementById("hashType");
+    const description = document.getElementById("hashDescription");
+    // const inputtedhash = document.getElementById("inputtedhash");
+
     if (checkHashPresence(Hashinput)) {
-        alert("No Hash Inputted")
-        return;
+        return alert("No Hash Inputted");
+    
     } else {
         Hashinput = Hashinput.toLocaleLowerCase();
         inputtedhash.innerText = "Inputted Hash: " + Hashinput;
 
-        checkHashLength(Hashinput, possibleHashes, hashPatterns)
-        checkHashCharacters(Hashinput, possibleHashes, hashPatterns)
-        checkHashPrefix(Hashinput, possibleHashes, hashPatterns)
+        checkHashLength(Hashinput)
+        checkHashCharacters(Hashinput)
+        checkHashPrefix(Hashinput)
+        compareHashes()
         
         hashType.textContent = `Possible Hashes: `
         hashType.textContent = `Possible Hashes: ${possibleHashes}`;
