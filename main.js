@@ -16,14 +16,10 @@ const Argon2 = new HashAlgorithm("Argon2", ["Contains $", "Contains =", "Contain
 const Bcrypt = new HashAlgorithm("bcrypt", ["Contains $", "60 Characters Long"]);
 
 let HashList = [SHA1, SHA256, SHA384, SHA512, SHA3, MD5, NTLM, Argon2, Bcrypt]
-
-// arr1.filter(x => arr2.includes(x));
-
-// var hashPatterns = []
-var Hashinput = " ";
-
+let Hashinput = " ";
 const identifiers = [""]
-
+let possibleHashes;
+let hashPatterns;
 
 function checkHashPresence(textHash) {
     return textHash.length == 0;
@@ -34,17 +30,22 @@ function exportError() {
 }
 
 function main() {
-    let hashPatterns = []
-    let possibleHashes = []
+    hashPatterns = []
+    possibleHashes = []
 
 
     function checkHashLength(text) {
+        HashLengthList = [40, 64, 96, 128, 56, 32, 60]
         textLength = text.length
 
         const charLength = document.getElementById("charCount")
         charLength.textContent = `Characters: ${textLength}`
 
-        hashPatterns.push(textLength + " Characters Long")
+        if (!HashLengthList.includes(textLength)) {
+            hashPatterns.push("Variable character length")
+        } else {
+            hashPatterns.push(textLength + " Characters Long")
+        }
     }
 
     function checkHashCharacters(text) {
@@ -62,7 +63,7 @@ function main() {
         }
 
         // regex to check if alphanumeric
-        if (/^[a-zA-Z0-9]+$/.test(text)) {
+        if (/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$/.test(text)) {
             hashPatterns.push("Alphanumeric Characters Only")
         }
     }
@@ -76,12 +77,15 @@ function main() {
     function compareHashes(){
         for (let index = 0; index < HashList.length; index++) {
             var element = HashList[index];
-
             var match = hashPatterns.filter(x => element.identifiers.includes(x));
 
             if (match.length == hashPatterns.length) {
                 possibleHashes.push(element.name)
             }
+        }
+
+        if (possibleHashes.length == 0) {
+            possibleHashes.push("No Algorithm Found")
         }
     }
     
@@ -129,12 +133,12 @@ function exportCSV() {
     }
     
     let csvRows = [];
-    csvRows.push("Possible Hashes,Description");
-    
+    csvRows.push("Input,Possible Hashes,Description");
+
     const hashesString = possibleHashes.join(", ");
     const patternsString = hashPatterns.join(", ");
     
-    csvRows.push(`"${hashesString}","${patternsString}"`);
+    csvRows.push(`"${Hashinput}","${hashesString}","${patternsString}"`);
     
     const csvContent = csvRows.join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
